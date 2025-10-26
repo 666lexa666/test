@@ -12,14 +12,27 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 const app = express();
 app.use(bodyParser.json());
 
+// GET / для проверки сервера
+app.get('/', (req, res) => {
+  res.send('Server is running');
+});
+
+// POST /api/order
 app.post('/api/order', async (req, res) => {
   try {
     console.log('📥 Incoming request body:', req.body);
 
     const { steamId, amount, api_login, api_key } = req.body;
 
+    // Проверяем обязательные поля
     if (!steamId || !amount || !api_login || !api_key) {
       return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    // 🔹 Если steamId === "ping", сразу отвечаем pong
+    if (steamId === "ping") {
+      console.log('Ping received, returning pong');
+      return res.status(200).json({ pong: true });
     }
 
     // Делим сумму на 100
@@ -67,6 +80,7 @@ app.post('/api/order', async (req, res) => {
   }
 });
 
+// Запуск сервера
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
